@@ -1,5 +1,0 @@
-{% if routing['float_static'] is defined %}
-{% for config in routing['float_static']  %}
-ip route {{ config['dest_net'] }} {{ config['dest_mask'] }} {{ config['exit_int_or_next_hop'] }} {{ config['metric'] }}
-{% endfor %}
-{% endif %}

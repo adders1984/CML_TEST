@@ -1,9 +1,0 @@
-{% if global['snmp'] is defined %}
-Snmp-server community {{ global['snmp']['community'] }} {{ global['snmp']['access'] }}	
-Snmp-server host {{ global['snmp']['nms_ip'] }} version 2c {{ global['snmp']['community'] }}
-{% endif %}
-{% if global['snmp']['traps'] is defined %}
-{% for config in global['snmp']['traps'] %}
-Snmp-server enable traps {{ config['trap'] }}
-{% endfor %}
-{% endif %}

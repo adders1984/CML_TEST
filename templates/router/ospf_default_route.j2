@@ -1,7 +1,0 @@
-{% if routing['default_route']['exit_int_or_next_hop'] is defined %}
-ip route 0.0.0.0 0.0.0.0 {{ routing['default_route']['exit_int_or_next_hop'] }}
-{% for config in routing['ospf']['global'] %}
-router ospf {{ config['pro_id'] }} 
-  default-information originate
-{% endfor %}
-{% endif %}

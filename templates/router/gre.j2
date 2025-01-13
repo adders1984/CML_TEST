@@ -1,8 +1,0 @@
-{% for config in routing['gre'] %}
-interface Tunnel{{ config['tunnel_no'] }}
-  ip address {{ config['tunnel_ip'] }} {{ config['tunnel_mask'] }}
-  tunnel source {{ config['tunnel_source_ip'] }}
-  tunnel destination {{ config['tunnel_dest_ip'] }} 
-  ip mtu {{ config['mtu'] }}
-  ip tcp adjust-mss {{ config['mss'] }}
-{% endfor %}
