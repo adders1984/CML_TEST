@@ -1,7 +1,7 @@
 ---
 
 - name:
-  hosts: CISCO
+  hosts: all
   gather_facts: "true"
   connection: network_cli
 
