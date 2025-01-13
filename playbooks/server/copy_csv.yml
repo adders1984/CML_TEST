@@ -1,0 +1,21 @@
+---
+
+- name: COPY CSV FILES TO FILE SERVER
+  hosts: TRNG-RNKSS-AF01
+
+  tasks:
+
+  - name: COPY CSV FILES
+    ansible.windows.win_copy:
+      src: /Users/Dad/Documents/Project_F15/FILES/AF01/
+      dest: C:\Users\Administrator\Documents\
+
+- name: COPY CSV FILES TO DOMAIN CONTROLLER
+  hosts: TRNG-RNKSS-DC01
+
+  tasks:
+
+  - name: COPY CSV FILES
+    ansible.windows.win_copy:
+      src: /Users/Dad/Documents/Project_F15/FILES/DC01/
+      dest: C:\Users\Administrator\Documents\

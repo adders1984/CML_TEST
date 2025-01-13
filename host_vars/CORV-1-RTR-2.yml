@@ -1,0 +1,187 @@
+---
+
+# CONNECTION SETTINGS
+ansible_user: "ansible"
+ansible_password: "cisco"
+ansible_network_os: "ios"
+ansible_become_password: "cisco"
+ansible_become: "true"
+ansible_become_method: "enable"
+
+global:
+  ip_helper_add: "10.0.4.129"
+  rid: "2.2.2.2"
+  users:
+    - username: "admin"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+    - username: "p.hill"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+    
+    - username: "s.king"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+  snmp:
+  community: "routers"
+  access: "ro"
+  nms_ip: "1.1.1.1"
+  traps:
+    - trap: "ospf"
+    - trap: "vrrp"
+
+  tracks:
+    - id: "1"
+      object: "interface GigabitEthernet0/0"
+      options: "line-protocol" 
+
+  
+
+interfaces:
+  - name: "GigabitEthernet0/0"
+    port_type: "roas"
+    des: "fhrp_physical"
+
+  - name: "GigabitEthernet0/0.5"
+    port_type: "vrrp"
+    des: "vlan_5_voip"
+    ip: "192.168.5.2"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "5"
+    group: "5"
+    vip: "192.168.5.1"
+    priority: "100"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    ip_helper: "false"
+    passive: "true"
+
+  - name: "GigabitEthernet0/0.9"
+    port_type: "vrrp"
+    des: "vlan_9_nav2"
+    ip: "172.16.8.2"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "9"
+    group: "9"
+    vip: "172.16.8.1"
+    priority: "110"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    passive: "true"
+
+  - name: "GigabitEthernet0/0.20"
+    port_type: "vrrp"
+    des: "vlan_20_cms-x"
+    ip: "172.16.3.2"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "20"
+    group: "20"
+    vip: "172.16.3.1"
+    priority: "110"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    passive: "true"
+
+  - name: "GigabitEthernet0/0.30"
+    port_type: "vrrp"
+    des: "vlan_30_impac"
+    ip: "172.31.19.2"
+    mask: "255.255.255.192"
+    encap: "dot1q"
+    vlan: "30"
+    group: "30"
+    vip: "172.31.19.1"
+    priority: "100"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    passive: "true"
+
+  - name: "GigabitEthernet0/0.42"
+    port_type: "hsrp"
+    des: "vlan_42_rnkss"
+    ip: "10.10.217.2"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "42"
+    group: "42"
+    vip: "10.10.217.1"
+    priority: "100"
+    preempt_delay: "180"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    passive: "true"
+
+  - name: "GigabitEthernet0/0.99"
+    port_type: "glbp"
+    des: "vlan_99_mgmt"
+    ip: "10.0.4.98"
+    mask: "255.255.255.224"
+    encap: "dot1q"
+    vlan: "99"
+    group: "99"
+    vip: "10.0.4.97"
+    priority: "100"
+    preempt_delay: "300"
+    load_bal: "round-robin"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    passive: "true"
+
+  - name: "GigabitEthernet0/1"
+    port_type: "physical"
+    des: "wan_link_to_corv-1-rtr-1"
+    ip: "10.0.4.129"
+    mask: "255.255.255.252"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "GigabitEthernet0/3"
+    port_type: "physical"
+    des: "isp_link"
+    ip: "12.0.4.1"
+    mask: "255.255.255.252"
+    pat: "outside"
+
+  - name: "loopback0"
+    port_type: "loop"
+    des: "r2_loopy_loo"
+    ip: "2.2.2.2"
+    mask: "255.255.255.255"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    
+routing:
+  default_route:
+    exit_int_or_next_hop: "GigabitEthernet0/3"
+
+  ospf:
+    global:
+      - pro_id: "100"
+        area: "0"
+        prop_def_route: "true"
+      
+              
+
+               
+      
+

@@ -1,0 +1,8 @@
+{% if global['stp'] is defined %}
+spanning-tree mode {{ global['stp']['mode'] }}
+{% endif %}
+
+{% if global['stp']['stp_rb'] == "true" %}
+spanning-tree vlan {{ global['stp']['vlan_pri'] }} root primary
+spanning-tree vlan {{ global['stp']['vlan_sec'] }} root secondary
+{% endif %}

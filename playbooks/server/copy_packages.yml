@@ -1,0 +1,19 @@
+---
+
+- name: COPY SOFTWARE / GPO BACKUP
+  hosts: TRNG-RNKSS-AF01
+
+  tasks:
+
+  - name: COPY MSI FILES TO FILE SERVER
+    ansible.windows.win_copy:
+      src: /Users/Dad/Documents/software/
+      dest: \\Trng-rnkss-af01\packages$\
+
+  - name: COPY GPO BACKUP TO FILE SERVER
+    ansible.windows.win_copy:
+      src: /Users/Dad/Documents/gpo_backup/
+      dest: \\Trng-rnkss-af01\gpo$\
+
+
+      

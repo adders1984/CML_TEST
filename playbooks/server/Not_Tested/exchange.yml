@@ -1,0 +1,40 @@
+---
+- name: INSTALL EXCHANGE
+  hosts: TRNG-RNKSS-DC02
+  become_method: runas
+  become: yes
+  become_user: rnkss\administrator
+  vars:
+    ansible_become_password: "{{ ansible_password }}"
+  
+  tasks:
+
+    - name: INSTALL IIS WITH MGMT TOOLS
+      ansible.windows.win_powershell:
+        script: |
+          Install-WindowsFeature -Name Web-Server -IncludeManagementTools
+      
+    - name: REBOOT
+      ansible.windows.win_reboot: 
+
+    - name: INSTALL REQUIRED FEATURES FOR EXCHANGE
+      ansible.windows.win_powershell:
+        script: |
+        
+          Install-WindowsFeature AS-HTTP-Activation, Desktop-Experience, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, Web-Mgmt-Console, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS
+          >
+    - name: INSTALL UCM 4.0
+      ansible.windows.win_powershell:
+        chdir: E:\
+        script: |
+          .\UcmaRuntimeSetup.exe -q
+
+    - name: REBOOT
+      ansible.windows.win_reboot:
+
+    - name: INSTALL EXCHANGE
+      ansible.windows.win_powershell:
+        chdir: D:\
+        script: |
+          .\Setup.exe /mode:Install /role:ClientAccess,Mailbox /OrganizationName:RNKSSCLIENTS /IAcceptExchangeServerLicenseTerms
+          #

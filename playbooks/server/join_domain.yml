@@ -1,0 +1,25 @@
+---
+
+- name: JOIN SERVERS AND CLIENTS TO THE DOMAIN
+  hosts: WIN_CLIENTS:TRNG-RNKSS-AF01
+  gather_facts: false
+  vars:
+    safe_mode_password: P@ssw0rd
+    domain_username: rnkss.hmsturing.navy.mil.uk\Administrator
+    domain_password: P@ssw0rd
+    domain_server: rnkss.hmsturing.navy.mil.uk
+
+  tasks:
+    - name: JOIN SERVERS AND CLIENTS TO THE DOMAIN
+      ansible.windows.win_domain_membership:
+        dns_domain_name: "{{ domain_server }}"
+        hostname: "{{ inventory_hostname }}"
+        domain_admin_user: "{{ domain_username }}"
+        domain_admin_password: "{{ domain_password }}"
+        domain_ou_path: "{{ org_unit }}"
+        state: domain
+      register: domain_state
+      
+    - name: Reboot
+      ansible.windows.win_reboot:
+      when: domain_state.reboot_required

@@ -1,0 +1,46 @@
+---
+
+- name: CREATE USERS
+  hosts: TRNG-RNKSS-DC01
+  become_method: runas
+  become: yes
+  become_user: rnkss\administrator
+
+  tasks:
+
+    - name: CREATE USERS AND REQUIRED ATTRIBUTES
+      ansible.windows.win_powershell:
+        script: |
+          $HomePath = "\\TRNG-RNKSS-AF01\Home$"
+          $ProfilePath = "\\TRNG-RNKSS-AF01\Profile$"
+          $import_users = Import-Csv -Path C:\Users\Administrator\Documents\domain_users.csv
+          $import_users | ForEach-Object {
+          $groups = $_.Group -split ','  # Split the value in the 'Group' column by comma
+
+              # Create the new user account
+              New-ADUser `
+                  -Name $_.Logon `
+                  -GivenName $_.FirstName `
+                  -Surname $_.Surname `
+                  -DisplayName $_.Logon `
+                  -UserPrincipalName $_.Logon `
+                  -SamAccountName $_.Logon `
+                  -AccountPassword $(ConvertTo-SecureString $_.Password -AsPlainText -Force) `
+                  -Enabled $True `
+                  -CannotChangePassword $True `
+                  -Path $_.Org_Unit `
+                  -HomeDrive "H:" `
+                  -HomeDirectory $($HomePath + "\" + $_.Logon)`
+                  -ProfilePath $($ProfilePath + "\" + $_.Logon) `
+                  -Title $_.Title `
+                  -Description $_.Description `
+                  -StreetAddress $_.BunkLocation `
+                  -Office $_.Office `
+                  -Department $_.Department 
+                  
+              # Add the user to each group
+              foreach ($group in $groups) {
+                  Add-ADGroupMember -Identity $group -Members $_.Logon
+              }
+          }
+         

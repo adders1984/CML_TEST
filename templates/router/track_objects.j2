@@ -1,0 +1,5 @@
+{% if global['tracks'] is defined %}
+{% for config in global['tracks'] %}
+track {{config['number'] }} {{ config['option_1'] }} {{ config['option_2'] }}
+{% endfor %}
+{% endif %}

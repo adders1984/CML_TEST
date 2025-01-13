@@ -1,0 +1,17 @@
+---
+
+- name: GATHER STP INFO
+  hosts: SWITCHES
+  gather_facts: "true"
+  connection: network_cli
+
+  tasks:
+    - name: Gather all legacy facts
+      cisco.ios.ios_facts:
+        gather_subset: all
+        gather_network_resources: l2_interfaces
+      register: stp_info
+
+    - name: print all facts
+      debug:
+        var: stp_info

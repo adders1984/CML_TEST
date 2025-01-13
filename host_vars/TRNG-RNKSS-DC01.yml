@@ -1,0 +1,17 @@
+---
+
+# CONNECTION SETTINGS
+ansible_user: "administrator"
+ansible_password: "P@ssw0rd"
+ansible_connection: "winrm"
+ansible_winrm_server_cert_validation: "ignore"
+
+# DOMAIN SETTINGS
+hostname: TRNG-RNKSS-DC01
+domain_mode: Win2012R2
+netbios: rnkss
+safe_mode_password: P@ssw0rd
+path: DC=rnkss,DC=hmsturing,DC=navy,DC=mil,DC=uk
+domain_username: rnkss.hmsturing.navy.mil.uk\Administrator
+domain_password: P@ssw0rd
+domain_server: rnkss.hmsturing.navy.mil.uk

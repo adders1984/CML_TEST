@@ -1,0 +1,31 @@
+---
+
+- name:
+  hosts: CISCO
+  gather_facts: "true"
+  connection: network_cli
+
+  tasks:
+    - name: Gather all legacy facts
+      cisco.ios.ios_facts:
+        gather_subset: all
+      register: ios_facts
+
+    - name: print all facts
+      debug:
+        var: ios_facts
+
+    - name: Print host information
+      debug:
+        msg: 
+          - HOST "{{ ios_facts['ansible_facts']['ansible_net_hostname'] }}"
+
+          - MODEL "{{ ios_facts['ansible_facts']['ansible_net_model'] }}"
+
+          - S/N "{{ ios_facts['ansible_facts']['ansible_net_serialnum'] }}" 
+
+          - version "{{ ios_facts['ansible_facts']['ansible_net_version'] }}"
+
+          - mem total "{{ ios_facts['ansible_facts']['ansible_net_memtotal_mb'] }}" Mb
+
+          - mem free "{{ ios_facts['ansible_facts']['ansible_net_memfree_mb'] }}" Mb

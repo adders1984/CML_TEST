@@ -1,0 +1,13 @@
+{% if global['dhcp_snooping_vlans'] is defined %}
+ip dhcp snooping
+ip dhcp snooping vlan {{ global['dhcp_snooping_vlans'] }}
+{% else %}
+{% endif %}
+
+{% for config in interfaces %}
+{% if config['dhcp_snoop_trust'] is defined %}
+interface {{ config['name'] }}
+ ip dhcp snooping trust
+{% else %}
+{% endif %}
+{% endfor %}

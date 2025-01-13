@@ -1,0 +1,427 @@
+---
+ansible_user: "ansible"
+ansible_password: "cisco"
+ansible_network_os: "ios"
+ansible_become_password: "cisco"
+ansible_become: "true"
+ansible_become_method: "enable"
+
+
+global:
+  rid: "2.2.2.2"
+  ip_helper_add: "1.1.1.1"
+  users:
+    - username: "admin"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+    - username: "p.hill"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+    
+    - username: "s.king"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+  tracks:
+    - id: "1"
+      object: "interface GigabitEthernet0/1"
+      options: "line-protocol"
+  
+interfaces:
+  - name: "Serial0/0/0"
+    port_type: "physical"
+    des: "wan_link_to_corv-1-rtr-1"
+    ip: "10.0.4.130"
+    mask: "255.255.255.252"
+
+  - name: "Serial0/0/1"
+    port_type: "physical"
+    des: "isp_link"
+    ip: "12.0.4.1"
+    mask: "255.255.255.252"
+    pat: "outside"
+    
+  - name: "GigabitEthernet0/1"
+    port_type: "roas"
+    des: "fhrp_physical"
+
+  - name: "GigabitEthernet0/1.5"
+    port_type: "vrrp"
+    des: "vlan_5_voip"
+    ip: "192.168.5.3"
+    mask: "255.255.255.0"
+    wildmask: "0.0.0.255"
+    encap: "dot1q"
+    vlan: "5"
+    group: "5"
+    vip: "192.168.5.1"
+    priority: "100"
+    preempt_delay: "300"
+    ip_helper: "true"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    eigrp_normal: "true"
+    eigrp_named: "true"
+    eigrp_key_chain: "eigrp"
+    eigrp_auth_mode: "md5"
+
+
+  - name: "GigabitEthernet0/1.9"
+    port_type: "vrrp"
+    des: "vlan_9_nav2"
+    ip: "172.16.8.3"
+    mask: "255.255.255.0"
+    wildmask: "0.0.0.255"
+    encap: "dot1q"
+    vlan: "9"
+    group: "9"
+    vip: "172.16.8.1"
+    priority: "100"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+    pat: "inside"
+
+  - name: "GigabitEthernet0/1.20"
+    port_type: "vrrp"
+    des: "vlan_20_cms-x"
+    ip: "172.16.3.3"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "20"
+    group: "20"
+    vip: "172.16.3.1"
+    priority: "100"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "GigabitEthernet0/1.30"
+    port_type: "vrrp"
+    des: "vlan_30_impac"
+    ip: "172.31.19.3"
+    mask: "255.255.255.192"
+    encap: "dot1q"
+    vlan: "30"
+    group: "30"
+    vip: "172.31.19.1"
+    priority: "100"
+    preempt_delay: "300"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "GigabitEthernet0/1.42"
+    port_type: "hsrp"
+    des: "vlan_42_rnkss"
+    ip: "10.10.217.3"
+    mask: "255.255.255.0"
+    encap: "dot1q"
+    vlan: "42"
+    group: "42"
+    vip: "10.10.217.1"
+    priority: "120"
+    preempt_delay: "180"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "GigabitEthernet0/1.99"
+    port_type: "glbp"
+    des: "vlan_99_mgmt"
+    ip: "10.0.4.98"
+    mask: "255.255.255.224"
+    encap: "dot1q"
+    vlan: "99"
+    group: "99"
+    vip: "10.0.4.99"
+    priority: "100"
+    preempt_delay: "300"
+    load_bal: "round-robin"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "loopback0"
+    port_type: "loop"
+    des: "r2_loopy_loo"
+    ip: "2.2.2.2"
+    mask: "255.255.255.255"
+    ospf: "true"
+    ospf_pro: "100"
+    ospf_area: "0"
+
+  - name: "tunnel0"
+    port_type: "gre"
+    des: "gre"
+    ip: "10.0.0.1"
+    mask: "255.255.255.252"
+    tunnel_src: "201.10.10.1"
+    tunnel_dest: "201.30.30.2"
+
+key_chain:
+  vrrp:
+    name: "vrrp"
+    key_no: "1"
+    auth: "md5"
+    key: "cisco"
+  hsrp:
+    name: "hsrp"
+    key_no: "1"
+    auth: "md5"
+    key: "cisco"
+  ospf:
+    name: "ospf"
+    key_no: "1"
+    auth: "md5"
+    key: "cisco"
+  glbp:
+    name: "glbp"
+    key_no: "1"
+    auth: "md5"
+    key: "cisco"
+  eigrp:
+    name: "eigrp"
+    key_no: "1"
+    auth: "md5"
+    key: "cisco"
+    
+routing:
+  default_route:
+    exit_int_or_next_hop: "Serial0/0/1"
+    
+
+  static:
+    - dest_net: "8.8.8.0"
+      dest_mask: "255.255.255.0"
+      exit_int_or_next_hop: "GigabitEthernet0/2"
+
+  float_static:
+    - dest_net: "20.20.20.20"
+      dest_mask: "255.255.255.0"
+      exit_int_or_next_hop: "GigabitEthernet0/2"
+      metric: "150"
+
+  ospf:
+    global:
+      - pro_id: "1"
+        area: "0"
+        
+  eigrp_named:
+    global:
+      - name: "TESTIE"
+        as: "10"
+    networks:
+      - net: "10.20.30.40 0.0.0.255"
+        wild_mask: "0.0.0.255"
+
+      - net: "10.40.50.60 0.0.0.255"
+        wild_mask: "0.0.0.255"
+
+    af_interfaces: 
+      - int: "GigabitEthernet0/2"
+        key_chain: "cisco"
+        auth_mode: "md5"
+
+  eigrp_normal:
+    global:
+      as: "10"
+
+    networks:
+      - net: "10.20.30.40"
+        wildmask: "0.0.0.255"
+      - net: "10.20.30.50"
+        wildmask: "0.0.0.255"
+
+    authentication:
+      - key_chain_name: "EIGRP"
+        key_no: "1"
+        key_string: "cisco"
+        algorithm: "md5"
+
+    interfaces:
+      - int: "GigabitEthernet0/2"
+        as: "10"
+        key_chain_name: "EIGRP"
+        algorithm: "md5"
+        key_string: "cisco"
+
+  gre:
+    - tunnel_int: "Tunnel0"
+      tunnel_ip: "10.0.0.1"
+      tunnel_mask: "255.255.255.252"
+      tunnel_source_ip: "201.10.10.1"
+      tunnel_dest_ip: "201.30.30.2"
+      mtu: "1400"
+      mss: "1360"
+
+  ipsec:
+    ike_phase_one:
+      - isakmp_policy_no: "10"
+        hash: "sha256"
+        auth: "pre-share"
+        pre_share_key: "Cisco!123"
+        pre_share_ip_address: "201.30.30.2"
+        group: "5"
+        lifetime: "5000"
+        encryption: "aes 256"
+        gre_ipsec_profile: "MY_IPSEC_PROFILE"
+
+    transform_set:
+      - name: "myset"
+        auth: "esp-sha-hmac"
+        encryption: "esp-aes"
+
+    profile:
+      - name: "MY_IPSEC_PROFILE"
+        transform_set: "myset"
+
+    access_list_extended:
+      - name: "ipsec"
+        src_net: "192.168.100.0"
+        src_mask: "0.0.0.255"
+        dest_net: "172.16.100.0"
+        dest_mask: "0.0.0.255"
+        remark: "ipsec_tunnel"
+
+    crypto_map:
+      - name: "VPN_MAP"
+        isakmp_policy_no: "10"
+        transform_set: "myset"
+        peer: "201.30.30.2"
+        match_acl: "ipsec"
+
+    ipsec_interface:
+      - int: "GigabitEthernet0/0"
+        cto_map: "VPN_MAP"
+
+cme:
+  telephony_service:
+    max_ephones:
+    max_dn:
+    src_add: 
+    src_port:
+    sys_msg:
+    moh_file: 
+    moh_mcast_add:
+    moh_mcast_port:
+
+  directory_numbers:
+    - dn: "1"
+      num: "5001"
+      name: "MCO"
+
+    - dn: "2"
+      num: "5002"
+      name: "OPS-Room"
+
+    - dn: "3"
+      num: "5003"
+      name: "Tech-office"
+
+    - dn: "4"
+      num: "5004"
+      name: "SCC"
+
+    - dn: "5"
+      num: "5005"
+      name: "Ships-office"
+
+    - dn: "6"
+      num: "5006"
+      name: "JPR"
+  
+  ephones:
+    - phone: "1"
+
+dhcp:
+  pool:
+    - name: "nav2"
+      type: "data"
+      net: "172.16.8.0"
+      mask: "/24"
+      def_rtr: "172.16.8.1"
+      dns: "10.10.217.25"
+      lease: "0 0 5"
+      excluded: "172.16.8.1 172.16.8.3"
+
+    - name: "cms-x"
+      type: "data"
+      net: "172.16.3.0"
+      mask: "/24"
+      def_rtr: "172.16.3.1"
+      dns: "10.10.217.25"
+      lease: "0 0 5"
+      excluded: "172.16.3.1 172.16.3.3"
+
+    - name: "impac"
+      type: "data"
+      net: "172.31.19.0"
+      mask: "/26"
+      def_rtr: "172.31.19.1"
+      dns: "10.10.217.25"
+      lease: "0 0 5"
+      excluded: "172.31.19.1 172.31.19.3"
+
+    - name: "rnkss"
+      type: "data"
+      net: "10.10.217.0"
+      mask: "/24"
+      def_rtr: "10.10.217.1"
+      dns: "10.10.217.25"
+      lease: "0 0 5"
+      excluded: "10.10.217.1 10.10.217.2"
+    
+    - name: "mgmt"
+      type: "data"
+      net: "10.0.4.96"
+      mask: "/27"
+      def_rtr: "10.0.4.110"
+      dns: "10.10.217.25"
+      lease: "0 0 5"
+      excluded: "10.0.4.98 10.0.4.126"
+
+    - name: "voip"
+      type: "voip"
+      net: "192.168.5.0"
+      mask: "/24"
+      def_rtr: "192.168.5.1"
+      option_150: "192.168.5.1"
+      excluded: "192.168.5.1"
+
+acl:      
+  extended:
+    config:
+      - name: "icmp"
+        interface:
+          - int: "FastEthernet0/1.9"
+          - int: "FastEthernet0/1.20"
+          - int: "FastEthernet0/1.30"
+          - int: "FastEthernet0/1.42"
+          - int: "FastEthernet0/1.99"
+        direction: "in"
+    ace:
+      - action: "permit"
+        protocol: "icmp"
+        source_net: "10.0.4.96"
+        source_wildmask: "0.0.0.31"
+        dest_net: "0.0.0.0"
+        dest_wildmask: "0.0.0.0"
+        option: "eq"
+        port: "echo"  
+
+        
+
+
+              
+
+               
+      
+

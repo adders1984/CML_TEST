@@ -1,0 +1,59 @@
+---
+
+- name: SETUP WINDOWS DEVICES FOR DOMAIN ENVIROMENT
+  hosts: WIN_SERVERS:WIN_CLIENTS
+  gather_facts: false
+  
+  tasks:
+  
+    - name: CHANGE HOSTNAME
+      ansible.windows.win_hostname:
+        name: "{{ hostname }}" 
+      register: res
+
+    - name: Reboot
+      ansible.windows.win_reboot:
+      when: res.reboot_required
+
+    - name: FIREWALL RULE TO ALLOW INBOUND ICMPv4
+      win_firewall_rule:
+        name: ICMP Allow incoming V4 echo request
+        enabled: yes
+        state: present
+        profiles: private
+        action: allow
+        direction: in
+        protocol: icmpv4
+
+    - name: ASSIGN DNS ADDRESS
+      ansible.windows.win_dns_client:
+        adapter_names: Ethernet0
+        dns_servers:
+        - "{{ primary_dns_ip }}"
+        - "{{ secondary_dns_ip }}"
+        
+- name: DCPROMO
+  hosts: TRNG-RNKSS-DC01
+  gather_facts: false
+
+  tasks:
+
+    - name: CREATE DOMAIN
+      ansible.windows.win_domain:
+        create_dns_delegation: no
+        database_path: C:\Windows\NTDS
+        dns_domain_name: "{{ domain_server }}"
+        domain_mode: "{{ domain_mode }}"
+        forest_mode: "{{ domain_mode }}"
+        domain_netbios_name: "{{ netbios }}"
+        safe_mode_password: "{{ safe_mode_password }}"
+        log_path: C:\Windows\NTDS
+        sysvol_path: C:\Windows\SYSVOL
+      register: res
+
+    - name: Reboot
+      ansible.windows.win_reboot:
+      when: res.reboot_required
+
+
+

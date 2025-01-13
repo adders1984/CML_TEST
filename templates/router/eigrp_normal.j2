@@ -1,0 +1,24 @@
+{% if routing['eigrp_normal'] is defined %}
+router eigrp {{ routing['eigrp_normal']['global']['as'] }}
+  {% if global['rid'] is defined %}
+  router-id {{ global['rid'] }}
+  {% endif %}
+  {% for config in interfaces %}
+  {% if config['eigrp_normal'] == "true" %}
+  network {{ config['ip'] }} {{ config['wildmask'] }}
+  {% endif %}
+  {% if config['eigrp_key_chain'] is defined %}
+interface {{ config['name'] }}
+  ip authentication mode eigrp {{ routing['eigrp_normal']['global']['as'] }} md5
+  ip authentication key-chain eigrp {{ routing['eigrp_normal']['global']['as'] }} key chain {{ config['eigrp_key_chain'] }}
+  {% endif %}
+  {% endfor %}
+{% for interface in interfaces %}
+{% if interface['eigrp_key_chain'] == "eigrp" %}
+key chain {{ key_chain['eigrp']['name ']}}
+  key {{ key_chain['eigrp']['key_no'] }}
+    key-string {{ key_chain['eigrp']['key'] }}
+    cryptographic-algorithm {{ key_chain['eigrp']['auth'] }}
+{% endif %}
+{% endfor %}
+{% endif %}

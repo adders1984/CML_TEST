@@ -1,0 +1,30 @@
+{% for config in routing['ipsec']['ike_phase_one'] %}
+crypto isakmp policy {{ config['isakmp_policy_no'] }}
+  hash {{ config['hash'] }}
+  authentication {{ config['auth'] }}
+  group {{ config['group'] }}
+  lifetime {{ config['lifetime'] }}
+  encryption {{ config['encryption'] }}
+{% if routing['ipsec']['auth'] == "pre-share" %}
+crypto isakmp key {{ config['pre_share_key'] }} {{ config['pre_share_ip_address'] }}
+{% endif %}
+{% endfor %}
+
+{% for config in routing['ipsec']['transform_set'] %}
+Crypto ipsec transform-set {{ config['name'] }} {{ config['auth'] }} {{ config['encryption'] }} 
+{% endfor %}
+
+{% for config in routing['ipsec']['profile'] %}
+crypto ipsec profile {{ config['name'] }}
+  set transform-set {{ config['transform_set'] }}
+{% endfor %} 
+  
+{% for config in routing['gre'] %}
+interface {{ config['tunnel_int'] }}
+  ip address {{ config['tunnel_ip'] }} {{ config['tunnel_mask'] }}
+  tunnel source {{ config['tunnel_source_ip'] }}
+  tunnel destination {{ config['tunnel_dest_ip'] }} 
+  ip mtu {{ config['mtu'] }}
+  ip tcp adjust-mss {{ config['mss'] }}
+  tunnel protection ipsec profile {{ config['gre_ipsec_profile'] }} 
+{% endfor %}

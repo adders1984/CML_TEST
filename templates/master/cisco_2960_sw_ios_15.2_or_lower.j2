@@ -1,0 +1,126 @@
+no ip domain-lookup
+service password-encryption
+ip ssh authentication-retries 3
+ip ssh time-out 10
+ip ssh version 2
+
+line console 0
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  exec-timeout 10 0
+  
+line vty 0 4
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  exec-timeout 10 0
+
+line vty 5 15
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  transport input none
+  exec-timeout 10 0
+
+{% if global['users'] is defined %}
+{% for user in global['users'] %}
+username {{ user['username']}} privilege {{ user['priv_level'] }} secret {{ user['secret'] }}
+{% endfor %}
+{% endif %}
+
+{% if global['ip_dgw'] is defined %}
+ip default-gateway {{ global['ip_dgw'] }}
+{% endif %}
+
+{% if global['vtp'] is defined %}
+vtp domain {{ global['vtp']['domain'] }}
+vtp mode {{ global['vtp']['mode'] }}
+vtp password {{ global['vtp']['key'] }}
+vtp version {{ global['vtp']['ver'] }}
+{% endif %}
+
+{% if global['vtp']['mode'] == "server" %}
+{% for vlan in global['vtp']['vlans'] %}
+vlan {{ vlan.num }}
+  name {{ vlan.name }}
+{% endfor %}
+{% endif %}
+
+{% if global['stp'] is defined %}
+spanning-tree mode {{ global['stp']['mode'] }}
+{% endif %}
+
+{% if global['stp']['stp_rb'] == "true" %}
+spanning-tree vlan {{ global['stp']['vlan_pri'] }} priority 4096
+spanning-tree vlan {{ global['stp']['vlan_sec'] }} priority 8192
+{% endif %}
+
+{% if global['dhcp_snooping_vlans'] is defined %}
+ip dhcp snooping
+ip dhcp snooping vlan {{ global['dhcp_snooping_vlans'] }}
+no ip dhcp snooping information option
+{% endif %}
+
+{% for interface in interfaces %}
+{% if interface['port_type'] == "trunk" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  switchport mode trunk
+  switchport trunk allowed vlan {{ interface['allowed_vlan'] }}
+  switchport nonegotiate
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "voice" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  switchport mode access
+  switchport access vlan {{ interface['vlan'] }}
+  switchport voice vlan {{ interface['voice_vlan'] }}
+  switchport port-security
+  switchport port-security mac-address sticky
+  switchport port-security maximum 5
+  spanning-tree portfast
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "access" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  switchport mode access
+  switchport access vlan {{ interface['vlan'] }}
+  switchport port-security
+  switchport port-security mac-address sticky
+  switchport port-security maximum 5
+  spanning-tree bpduguard enable
+  spanning-tree portfast
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "etherchannel" %}
+interface {{ interface['name'] }}
+  channel-group 1 mode {{ interface['mode'] }}
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "portchannel" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  switchport mode trunk 
+  switchport trunk allowed vlan {{ interface['allowed_vlan'] }}
+  switchport nonegotiate
+{% endif %}
+{% if interface['des'] == "not_used" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  switchport access vlan {{ global['dump_vlan'] }}
+  shutdown
+{% endif %}
+{% if interface['port_type'] == "svi" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  ip address {{ interface['ipaddr'] }}
+  no shutdown
+{% endif %}
+{% if interface['dhcp_snoop_trust'] is defined %}
+interface {{ interface['name'] }}
+  ip dhcp snooping trust
+{% endif %}
+{% endfor %}

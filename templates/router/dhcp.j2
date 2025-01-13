@@ -1,0 +1,28 @@
+{% if dhcp['pool'] is defined %}
+{% for config in dhcp['pool'] %}
+{% if dhcp['pool'] is defined and config['type'] == "data" %}
+ip dhcp excluded-address {{ config['excluded']}}
+ip dhcp pool {{ config['name'] }}
+  network {{ config['net'] }} {{ config['mask'] }}
+  default-router {{ config['def_rtr'] }}
+  dns-server {{ config['dns'] }}
+  lease {{ config['lease'] }}
+{% endif %}
+
+{% if dhcp['pool'] is defined and config['type'] == "voip" %}
+ip dhcp excluded-address {{ config['excluded'] }}
+ip dhcp pool {{ config['name'] }}
+  network {{ config['net'] }} {{ config['mask'] }}
+  default-router {{ config['def_rtr'] }}
+  option 150 ip {{ config['option_150'] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% for interface in interfaces %}
+{% if interface['ip_helper'] == "true" %}
+interface {{ interface['name'] }}
+  ip helper-address {{ global['ip_helper_add'] }}
+{% else %}
+{% endif %}
+{% endfor %}

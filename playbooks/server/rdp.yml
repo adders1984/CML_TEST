@@ -1,0 +1,21 @@
+---
+- name: ENABLE REMOTE DESKTOP
+  hosts: WINDOWS_SERVERS
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: CHECK IF RDP IS ENABLED
+      win_shell: 'reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v "fDenyTSConnections"'
+      register: rdp_check
+      changed_when: false
+
+    - name: ENABLE RDP IF NOT ALREADY ENABLED
+      win_shell: 'reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v "fDenyTSConnections" /t REG_DWORD /d 0 /f'
+      when: rdp_check.stdout.find('0x0') == -1
+      changed_when: true
+
+    - name: START REMOTE DESKTOP SERVICES
+      win_service:
+        name: TermService
+        state: started

@@ -1,0 +1,7 @@
+{% if global['defaults']['portfast'] is defined %}
+spanning-tree portfast edge default
+{% endif %}
+
+{% if global['defaults']['bpduguard'] is defined %}
+spanning-tree portfast edge bpduguard default
+{% endif %}

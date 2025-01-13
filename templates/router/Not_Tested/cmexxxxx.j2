@@ -1,0 +1,34 @@
+{% if cme['telephony_service'] is defined %}
+telephony-service
+  max-ephones {{ cme['telephony_service']['max_ephones'] }}
+  max-dn {{ cme['telephony_service']['max_dn'] }}
+  ip source-address {{ cme['telephony_service']['src_add'] }} port {{ cme['telephony_service']['src_port']}}
+  system message {{ cme['telephony_service']['sys_msg'] }}
+  moh {{ cme['telephony_service']['moh_file'] }}
+  multicast moh {{ cme['telephony_service']['moh_mcast_add'] }} port {{ cme['telephony_service']['moh_mcast_port'] }}
+  transfer-system full-consult
+{% else %}
+{% endif %}
+
+
+{% for config in cme['directory_numbers'] %}
+{% if cme['telephony_service']['directory_numbers'] is defined %}
+ephone-dn {{ config['dn'] }}
+  number {{ config['num'] }}
+  name {{ config['name'] | upper }}
+  {% else %}
+{% endif %}
+{% endfor %}
+
+{% for config in cme['ephones'] %}
+{% if cme['telephony_service']['ephones'] is defined %}
+
+
+ephone-dn {{ config['dn'] }}
+  number {{ config['num'] }}
+  name {{ config['name'] | upper }}
+
+  
+  {% else %}
+{% endif %}
+{% endfor %}

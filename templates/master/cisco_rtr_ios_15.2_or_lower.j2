@@ -1,0 +1,207 @@
+no ip domain-lookup
+service password-encryption
+ip ssh authentication-retries 3
+ip ssh time-out 10
+ip ssh version 2
+
+line console 0
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  exec-timeout 10 0
+  
+line vty 0 4
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  exec-timeout 10 0
+
+line aux 0
+  login local
+  exec-timeout 10 0
+  logging synchronous
+  transport input none
+
+{% if global['users'] is defined %}
+{% for user in global['users'] %}
+username {{ user['username']}} privilege {{ user['priv_level'] }} secret {{ user['secret'] }}
+{% endfor %}
+{% endif %}
+
+{% for interface in interfaces %}
+{% if interface['port_type'] == "physical" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  ip address {{ interface['ip']}} {{ interface['mask'] }}
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "roas" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  no shutdown
+{% endif %}
+{% if interface['port_type'] == "loop" %}
+interface {{ interface['name'] }}
+  description {{ interface['des'] | upper }}
+  ip address {{ interface['ip']}} {{ interface['mask'] }}
+{% endif %}
+{% if interface['port_type'] == "vrrp" %}
+interface {{ interface['name'] }}
+  encapsulation {{ interface['encap'] }} {{ interface['vlan'] }}
+  ip address {{ interface['ip'] }} {{ interface['mask'] }}
+  vrrp {{ interface['group'] }} ip {{ interface['vip'] }}
+  vrrp {{ interface['group'] }} priority {{ interface['priority'] }}
+  vrrp {{ interface['group'] }} preempt delay min {{ interface['preempt_delay'] }}
+{% endif %}
+{% if interface['port_type'] == "hsrp" %}
+interface {{ interface['name'] }}
+  encapsulation {{ interface['encap'] }} {{ interface['vlan'] }}
+  ip address {{ interface['ip'] }} {{ interface['mask'] }}
+  standby {{ interface['group'] }} ip {{ interface['vip'] }}
+  standby {{ interface['group'] }} priority {{ interface['priority'] }}
+  standby {{ interface['group'] }} preempt delay minimum {{ interface['preempt_delay'] }}
+{% endif %}
+{% if interface['port_type'] == "glbp" %}
+interface {{ interface['name'] }}
+  encapsulation {{ interface['encap'] }} {{ interface['vlan'] }}
+  ip address {{ interface['ip'] }} {{ interface['mask'] }}
+  glbp {{ interface['group'] }} ip {{ interface['vip'] }}
+  glbp {{ interface['group'] }} priority {{ interface['priority'] }}
+  glbp {{ interface['group'] }} preempt delay min {{ interface['preempt_delay'] }}
+  glbp {{ interface['group'] }} load-balancing {{ interface['load_bal'] }}
+{% endif %}
+{% if interface['port_type'] == "gre" %}
+interface {{ interface['name'] }}
+  ip address {{ interface['ip'] }} {{ interface['mask'] }}
+  tunnel source {{ interface['tunnel_src'] }}
+  tunnel destination {{ interface['tunnel_dest'] }}
+  ip mtu 1400
+  ip tcp adjust-mss 1360
+{% endif %}
+{% endfor %}
+
+{% if dhcp['data'] is defined %}
+{% for config in dhcp['data'] %}
+ip dhcp excluded-address {{ config['excluded']}}
+ip dhcp pool {{ config['name'] }}
+  network {{ config['net'] }} {{ config['mask'] }}
+  default-router {{ config['def_rtr'] }}
+  dns-server {{ config['dns'] }}
+  lease {{ config['lease'] }}
+{% endfor %}
+{% endif %}
+
+
+{% if dhcp['voip'] is defined %}
+{% for config in dhcp['voip'] %}
+ip dhcp excluded-address {{ config['excluded'] }}
+ip dhcp pool {{ config['name'] }}
+  network {{ config['net'] }} {{ config['mask'] }}
+  default-router {{ config['def_rtr'] }}
+  option 150 ip {{ config['option_150'] }}
+{% endfor %}
+{% endif %}
+
+
+{% for interface in interfaces %}
+{% if interface['ip_helper'] is defined and interface['ip_helper'] == "true" %}
+interface {{ interface['name'] }}
+  ip helper-address {{ global['ip_helper_add'] }}
+{% else %}
+{% endif %}
+{% endfor %}
+
+{% if routing['static'] is defined %}
+{% for config in routing['static']  %}
+ip route {{ config['dest_net'] }} {{ config['dest_mask'] }} {{ config['exit_int_or_next_hop'] }}
+{% endfor %}
+{% endif %}
+
+{% if routing['float_static'] is defined %}
+{% for config in routing['float_static']  %}
+ip route {{ config['dest_net'] }} {{ config['dest_mask'] }} {{ config['exit_int_or_next_hop'] }} {{ config['metric'] }}
+{% endfor %}
+{% endif %}
+
+{% if routing['default_route'] is defined %}
+ip route 0.0.0.0 0.0.0.0 {{ routing['default_route']['exit_int_or_next_hop'] }}
+{% endif %}
+
+{% if routing['default_route'] is defined and routing['ospf']['global'] is defined %}
+{% for config in routing['ospf']['global'] %}
+{% if config['prop_def_route'] == "true" %}
+router ospf {{ config['pro_id'] }}
+  default-information originate
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% for interface in interfaces %}
+{% if interface['ospf'] is defined %}
+interface {{ interface['name'] }}
+  ip ospf {{ interface['ospf_pro'] }} area {{ interface['ospf_area'] }} 
+{% endif %}
+{% if interface['passive'] is defined and interface['ospf'] is defined %}
+router ospf {{ interface['ospf_pro'] }}
+  passive-interface {{ interface['name'] }}
+{% endif %}
+{% endfor %}
+
+{% if routing['eigrp_named'] is defined %}
+{% for config in routing['eigrp_named']['global']  %}
+router eigrp {{ config['name'] }}
+  address-family ipv4 unicast autonomous-system {{ config['as'] }}
+{% endfor %}
+  eigrp router-id {{ global['rid'] }}
+  {% for config in interfaces %}
+  {% if config['eigrp_normal'] == "true" %}
+  network {{ config['ip'] }} {{ config['wildmask'] }}
+  {% endif %}
+{% endfor %}
+{% endif %}
+
+{% if routing['eigrp_normal'] is defined %}
+router eigrp {{ routing['eigrp_normal']['global']['as'] }}
+  {% if global['rid'] is defined %}
+  router-id {{ global['rid'] }}
+  {% endif %}
+  {% for config in interfaces %}
+  {% if config['eigrp_normal'] == "true" %}
+  network {{ config['ip'] }} {{ config['wildmask'] }}
+  {% endif %}
+  {% if config['passive'] == "true" and config['eigrp_normal'] is defined %}
+  passive-interface {{ config['name'] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if routing['eigrp_normal']['global']['as'] is defined and routing['eigrp_normal']['global']['as']['prop_def_route'] == "true" %}
+router eigrp {{ routing['eigrp_normal']['global']['as'] }}
+  redistribute static
+{% endif %}
+
+{% for config in interfaces %}
+{% if config['pat'] is defined and config['pat'] == "inside" %}
+interface {{ config['name'] }}
+  ip nat inside
+{% endif %}
+{% if config['pat'] is defined and config['wildmask'] is defined %}
+ip access-list standard NAT_INSIDE_NETWORKS
+  permit {{ config['ip'] }} {{ config['wildmask'] }}
+{% endif %}
+{% if config['pat'] is defined and config['pat'] == "outside" %}
+interface {{ config['name'] }}
+  ip nat outside
+ip nat inside source list NAT_INSIDE_NETWORKS interface {{ config['name'] }} overload
+{% endif %}
+{% endfor %}
+
+{% if global['tracks'] is defined %}
+{% for config in global['tracks'] %}
+track {{ config['id'] }} {{ config['object'] }} {{ config['options'] }}
+{% endfor %}
+{% endif %}
+
+
+
+

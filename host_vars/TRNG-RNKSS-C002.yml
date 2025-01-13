@@ -1,0 +1,17 @@
+---
+
+# CONNECTION SETTINGS
+ansible_user: "admin"
+ansible_password: "P@ssw0rd"
+ansible_connection: "winrm"
+ansible_winrm_server_cert_validation: "ignore"
+
+# DOMAIN SETTINGS
+hostname: TRNG-RNKSS-C002
+domain_mode: Win2012R2
+netbios: TRNG-RNKSS-C002
+safe_mode_password: P@ssw0rd
+domain_username: rnkss.hmsturing.navy.mil.uk\Administrator
+domain_password: P@ssw0rd
+domain_server: rnkss.hmsturing.navy.mil.uk
+org_unit: OU=CIS,OU=ENGINEERING,DC=rnkss,DC=hmsturing,DC=navy,DC=mil,DC=uk
