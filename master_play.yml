@@ -1,0 +1,40 @@
+---
+
+- name: CONFIGURE CISCO DEVICES
+  connection: network_cli
+  gather_facts: true
+  hosts: cisco
+
+  tasks:   
+    - name: Gather all legacy facts
+      cisco.ios.ios_facts:
+        gather_subset: all
+      register: ios_facts
+
+    - name: CONFIGURE CISCO IOS SWITCHES WITH IOS VERSION 15.2 OR LOWER
+      ios_config:
+        src: /Users/Dad/Documents/Project_F15/templates/master/cisco_2960_sw_ios_15.2_or_lower.j2
+      when: ios_facts['ansible_facts']['ansible_net_model'] == "WS-C2960-24TT-L" and ios_facts['ansible_facts']['ansible_net_version'] <= "15.2"
+
+    - name: CONFIGURE CISCO IOS SWITCHES WITH IOS VERSION 15.3 OR HIGHER
+      ios_config:
+        src: /Users/Dad/Documents/Project_F15/templates/master/cisco_2960_sw_ios_15.3_or_higher.j2
+      when: ios_facts['ansible_facts']['ansible_net_model'] == "WS-C2960-24TT-L" and ios_facts['ansible_facts']['ansible_net_version'] >= "15.3"
+
+    - name: CONFIGURE CISCO IOS ROUTERS WITH IOS 12.5 OR LOWER
+      ios_config:
+        src: /Users/Dad/Documents/Project_F15/templates/master/cisco_rtr_ios_15.2_or_lower.j2
+      when: ios_facts['ansible_facts']['ansible_net_model'] == "2801" and ios_facts['ansible_facts']['ansible_net_version'] <= "12.5"
+
+    - name: CONFIGURE CISCO IOS ROUTERS WITH IOS 12.6 OR HIGHER
+      ios_config:
+        src: /Users/Dad/Documents/Project_F15/templates/master/cisco_rtr_ios_15.3_or_higher.j2
+      when: ios_facts['ansible_facts']['ansible_net_model'] == "2801" and ios_facts['ansible_facts']['ansible_net_version'] >= "12.6"
+
+- import_playbook: /Users/Dad/Documents/Project_F15/playbooks/network/ssh_acl.yml
+- import_playbook: /Users/Dad/Documents/Project_F15/playbooks/network/banners.yml
+
+
+
+
+
