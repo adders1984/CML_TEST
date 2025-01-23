@@ -1,0 +1,54 @@
+---
+
+# CONNECTION SETTINGS
+ansible_user: "ansible"
+ansible_password: "cisco"
+ansible_network_os: "ios"
+ansible_become_password: "cisco"
+ansible_become: "true"
+ansible_become_method: "enable"
+  
+global:
+  users:
+    - username: "admin"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+    - username: "p.hill"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+    
+    - username: "s.king"
+      priv_level: "15"
+      algorithm: "md5"
+      secret: "cisco"
+
+interfaces: 
+  - name: "GigabitEthernet0/0"
+    port_type: "physical"
+    des: "wan_link_to_corv-1-rtr-2"
+    ip: "12.0.4.2"
+    mask: "255.255.255.252"
+    
+  - name: "loopback0"
+    port_type: "loop"
+    des: "isp_loopy_loo"
+    ip: "8.8.8.8"
+    mask: "255.255.255.255"
+
+
+
+
+    
+
+ 
+    
+        
+
+
+
+    
+         
+
