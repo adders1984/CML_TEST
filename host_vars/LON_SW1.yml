@@ -1,0 +1,9 @@
+---
+
+# CONNECTION SETTINGS
+ansible_user: "cisco"
+ansible_password: "cisco"
+ansible_network_os: "ios"
+ansible_become_password: "cisco"
+ansible_become: "true"
+ansible_become_method: "enable"
