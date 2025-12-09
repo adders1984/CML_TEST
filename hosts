@@ -1,8 +1,36 @@
 [all]
-SW1 ansible_host=192.168.1.253
-R1 ansible_host=192.168.1.254
-R2 ansible_host=172.16.100.1
-R3 ansible_host=172.16.200.1
+LON_SW1 ansible_host=10.50.99.1
+LON_SW2 ansible_host=10.50.99.2
+LON_SW3 ansible_host=10.50.99.3
+LON_SW4 ansible_host=10.50.99.4
+LON_R1 ansible_host=10.50.99.13
+LON_R2 ansible_host=10.50.99.12
+MAN_R1 ansible_host=192.168.100.254
+MAN_SW1 ansible_host=192.168.100.253
+SWE_R1 ansible_host=192.168.200.254
+SWE_SW1 ansible_host=192.168.200.253
+USA_R1 ansible_host=172.16.100.254
+USA_SW1 ansible_host=172.16.100.253
+
+[LONDON]
+LON_SW1
+LON_SW2 
+LON_SW3 
+LON_SW4 
+LON_R1 
+LON_R2 
+
+[MANCHESTER]
+MAN_R1
+MAN_SW1
+
+[SWEDEN]
+SWE_R1
+SWE_SW1 
+
+[USA]
+USA_R1
+USA_SW1 
 
 
 
